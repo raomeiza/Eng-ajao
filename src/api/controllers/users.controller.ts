@@ -14,7 +14,7 @@ const userData:IUserData = {
     "id": "6142b4a3b0d7f4f8a7f8b7f6"
 }
 
-const userPayload: IUserPayload = {
+const userPayload: { email: string, password: string } = {
   email: 'john@doe.com',
   password: '12345',
 }
@@ -89,7 +89,7 @@ export class userController extends Controller {
   @Response(201, 'user logged in successfully')
   public async login(
     @Res() sendResponse: TsoaResponse<400 | 500 | 401, { resp: { success: true | false, message: string, data: any } }>,
-    @Body() payload: IUserPayload,
+    @Body() payload: { email: string, password: string }
   ): Promise<any> {
     try {
       validations.login(payload) // validate the payload
