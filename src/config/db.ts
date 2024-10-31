@@ -9,7 +9,7 @@ const InitiateMongoServer = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       // set database name to match the database name in the mongodb
-      dbName: 'express_typescript_skeleton',
+      dbName: 'soil-monitoring-app',
     });
     console.log('Connected to DB !!');
   } catch (ex:any) {
