@@ -80,12 +80,18 @@
 				"additionalProperties": false
 			}
 		},
-		"securitySchemes": {}
+		"securitySchemes": {
+			"apiKey": {
+				"type": "apiKey",
+				"name": "X-API-KEY",
+				"in": "header"
+			}
+		}
 	},
 	"info": {
-		"title": "calculator_server",
+		"title": "soil-monitoring-api",
 		"version": "1.0.0",
-		"description": "A simple server for a calculator app written in typescript",
+		"description": "An api server for soil monitoring system focused on robust security and performance in IOT applications",
 		"license": {
 			"name": "ISC"
 		},
@@ -161,7 +167,7 @@
 						}
 					}
 				},
-				"description": "Used for user registratiion.\nSupply the user's name, unique email and password",
+				"description": "Used for user registratiion.\r\nSupply the user's name, unique email and password",
 				"tags": [
 					"USER"
 				],
@@ -763,7 +769,16 @@
 					"USER"
 				],
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "header",
+						"name": "auth",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},

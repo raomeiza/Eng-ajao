@@ -12,7 +12,7 @@ const errorHandler = function errorHandler(
   
   if (err.status === 404) {
     if (req.url.indexOf('.') === -1) {
-      console.log('req.url', req.url);
+console.log('req.url', req.url);
       res.redirect(`${BASE_URL}/app?original_url=${req.url}`);
       return;
     }
@@ -25,7 +25,7 @@ const errorHandler = function errorHandler(
     return res.status(422).json({
       success:false,
       message: "Validation Failed",
-      errorData: err?.fields,
+      error: err?.fields,
     });
   }
   if (err instanceof Error) {

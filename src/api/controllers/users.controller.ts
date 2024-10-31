@@ -170,10 +170,12 @@ export class userController extends Controller {
   @Response(200, 'users fetched successfully')
   public async getAll(
     @Res() sendResponse: TsoaResponse<400 | 500 | 401, { success: true | false, message: string, data: any }>,
-    @Request() req: any,
+    // @Request() req: any,
+    @Header('auth') authorization: string
   ): Promise<any> {
     try {
-      let token = req.headers.authorization.split(' ')[1]
+      let token = authorization
+      console.log('token', token)
       const user = await tokenizer.verifyToken(token)
       if(!user) throw ({ message: 'User not authorized', status: 401 })
 

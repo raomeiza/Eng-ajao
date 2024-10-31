@@ -7,6 +7,8 @@ import basicAuth from 'express-basic-auth';
 const swaggerDocument = require('../../docs/swagger.json');
 //import './telegram/telegram';
 import expressError from '../utils/express.error';
+import { ParamsDictionary } from 'express-serve-static-core';
+import { ParsedQs } from 'qs';
 
 // Instance of express
 const app: express.Application = express();
@@ -43,8 +45,8 @@ app.use('/api-docs', basicAuth({
   realm: 'Imb4T3st4pp',
 }), swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-
-app.use(expressError);
+// @ts-ignore
+app.use((err: any, req: express.Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: express.Response<any, Record<string, any>>, next: express.NextFunction) => expressError(err, req, res, next));
 // Routers
 
 

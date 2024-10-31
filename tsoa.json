@@ -6,6 +6,13 @@
   ],
   "spec": {
     "outputDirectory": "docs",
+    "securityDefinitions": {
+      "apiKey": {
+        "type": "apiKey",
+        "name": "X-API-KEY",
+        "in": "header"
+      }
+    },
     "specVersion": 3
   },
   "routes": {

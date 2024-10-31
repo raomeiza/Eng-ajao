@@ -164,7 +164,7 @@ export function RegisterRoutes(app: Router) {
             function userController_getAll(request: any, response: any, next: any) {
             const args = {
                     sendResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"data":{"dataType":"any","required":true},"message":{"dataType":"string","required":true},"success":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":[true]},{"dataType":"enum","enums":[false]}],"required":true}}},
-                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+                    authorization: {"in":"header","name":"auth","required":true,"dataType":"string"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
