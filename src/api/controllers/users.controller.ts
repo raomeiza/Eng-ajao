@@ -17,7 +17,6 @@ const userData:IUserData = {
 const userPayload: IUserPayload = {
   email: 'john@doe.com',
   password: '12345',
-  name: 'john doe'
 }
 
 const loginPayload: IUserPayload = {

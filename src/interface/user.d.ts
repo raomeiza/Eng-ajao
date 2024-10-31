@@ -1,7 +1,6 @@
 export interface IUserPayload {
   email: string;
   password: string;
-  name?: string;
 }
 
 interface IRegisterPayload extends IUserPayload {
