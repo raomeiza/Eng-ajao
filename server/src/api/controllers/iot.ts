@@ -6,6 +6,7 @@ import { iotValidation } from "../validations/iot.validation";
 import { generateTOTP, verifyTOTP } from "../../utils/totp";
 import mongoose from "mongoose";
 import { signToken, verifyToken } from "../../utils/tokenizer";
+import io from "../../utils/socket";
 
 @Route('iot')
 @Tags('IOT')
@@ -134,6 +135,7 @@ export class IOTController {
         device.token = newToken
         await device.save() // update the device
         iotValidation.data(payload) // validate the payload
+        io.emit('data', payload) // emit the data
         await IOTDataModel.insertMany(payload.map(data => ({ ...data}))) // insert the data
         return await sendResponse(200, 'IOT data received successfully', {"X-API-Key": newToken})
       } catch (err: any) {
