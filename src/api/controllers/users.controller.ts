@@ -1,6 +1,6 @@
 import { IErrorResponse, sendError, sendSuccess } from '../../utils/response-handler'
 import userService from '../services/user.services'
-import tokenizer from '../../utils/tokenizer'
+import {refreshToken, signToken, verifyToken} from '../../utils/tokenizer'
 import * as validations from '../validations/user.validation'
 //@ts-ignore
 import { Route, Res, Request,  Patch, Get, TsoaResponse, Delete, Header, Body, Response, Tags, Example, Controller, Post } from 'tsoa'
@@ -69,7 +69,7 @@ export class userController extends Controller {
     try {
       validations.register(payload) // validate the payload
       const user = await userService.Register(payload)
-      let token = await tokenizer.signToken(user)
+      let token = await signToken(user)
       return await sendSuccess({ ...user, token }, 'user registered successfully', 201)
     } catch (err: any) {
       return sendError(sendResponse, err)
@@ -95,7 +95,7 @@ export class userController extends Controller {
       validations.login(payload) // validate the payload
       
       const user = await userService.Login(payload)
-      let token = await tokenizer.signToken(user)
+      let token = await signToken({...user, isAdmin: true})
       return sendSuccess({ ...user, token }, 'user logged in successfully' )
     } catch (err: any) {
       return sendError(sendResponse, err)
@@ -145,14 +145,14 @@ export class userController extends Controller {
     @Request() req: any,
   ): Promise<any> {
     let token = req.headers.authorization
-    const user = await tokenizer.verifyToken(token)
+    const user = await verifyToken(token)
     if(!user) throw ({ message: 'User not authorized', status: 401 })
 
     try {
       validations.isValidEmail(payload.email) // validate the payload
 
       const updatedUser = await userService.ChangePassword(payload, user.userId)
-      token = await tokenizer.refreshToken(token)
+      token = await refreshToken(token)
       return sendSuccess({ ...updatedUser, token }, 'password changed successfully' )
     } catch (err: any) {
       return sendError(sendResponse, err)
@@ -175,12 +175,12 @@ export class userController extends Controller {
     try {
       let token = authorization
       console.log('token', token)
-      const user = await tokenizer.verifyToken(token)
+      const user = await verifyToken(token)
       if(!user) throw ({ message: 'User not authorized', status: 401 })
 
       const users = await userService.GetAll()
 
-      token = await tokenizer.refreshToken(token) // refresh token
+      token = (await refreshToken(token)).getToken() // refresh token
       return sendSuccess({ users, token }, 'users fetched successfully')
     } catch (err: any) {
       return sendError(sendResponse, err)

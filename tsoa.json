@@ -7,9 +7,9 @@
   "spec": {
     "outputDirectory": "docs",
     "securityDefinitions": {
-      "apiKey": {
+      "Bearer": {
         "type": "apiKey",
-        "name": "X-API-KEY",
+        "name": "Authorization",
         "in": "header"
       }
     },

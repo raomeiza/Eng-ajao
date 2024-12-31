@@ -3,6 +3,8 @@
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { Controller, ValidationService, FieldErrors, ValidateError, TsoaRoute, HttpStatusCodeLiteral, TsoaResponse, fetchMiddlewares } from '@tsoa/runtime';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { IOTController } from './../controllers/iot';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { userController } from './../controllers/users.controller';
 import type { RequestHandler, Router } from 'express';
 
@@ -17,6 +19,19 @@ const models: TsoaRoute.Models = {
             "error": {"dataType":"object","required":true},
             "code": {"dataType":"double","required":true},
             "errorStack": {"dataType":"any"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IOTReqPayload": {
+        "dataType": "refObject",
+        "properties": {
+            "batteryVoltage": {"dataType":"double","required":true},
+            "temperature": {"dataType":"double","required":true},
+            "humidity": {"dataType":"double","required":true},
+            "soilMoisture": {"dataType":"double","required":true},
+            "isCharging": {"dataType":"boolean","required":true},
+            "time": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },
@@ -52,6 +67,91 @@ export function RegisterRoutes(app: Router) {
     //  NOTE: If you do not see routes for all of your controllers in this file, then you might not have informed tsoa of where to look
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
+        app.post('/iot/register',
+            ...(fetchMiddlewares<RequestHandler>(IOTController)),
+            ...(fetchMiddlewares<RequestHandler>(IOTController.prototype.register)),
+
+            function IOTController_register(request: any, response: any, next: any) {
+            const args = {
+                    sendResponse: {"in":"res","name":"401","required":true,"ref":"IErrorResponse"},
+                    payload: {"in":"body","name":"payload","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"mac":{"dataType":"string","required":true}}},
+                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+                    user: {"in":"header","name":"Authorization","dataType":"any"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new IOTController();
+
+
+              const promise = controller.register.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/iot/new-token',
+            ...(fetchMiddlewares<RequestHandler>(IOTController)),
+            ...(fetchMiddlewares<RequestHandler>(IOTController.prototype.newToken)),
+
+            function IOTController_newToken(request: any, response: any, next: any) {
+            const args = {
+                    sendResponse: {"in":"res","name":"401","required":true,"ref":"IErrorResponse"},
+                    payload: {"in":"body","name":"payload","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"mac":{"dataType":"string","required":true}}},
+                    token: {"in":"header","name":"Authorization","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new IOTController();
+
+
+              const promise = controller.newToken.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/iot/data',
+            ...(fetchMiddlewares<RequestHandler>(IOTController)),
+            ...(fetchMiddlewares<RequestHandler>(IOTController.prototype.data)),
+
+            function IOTController_data(request: any, response: any, next: any) {
+            const args = {
+                    sendResponse: {"in":"res","name":"401","required":true,"dataType":"string"},
+                    payload: {"in":"body","name":"payload","required":true,"dataType":"array","array":{"dataType":"refObject","ref":"IOTReqPayload"}},
+                    req: {"in":"request","name":"req","required":true,"dataType":"object"},
+                    token: {"in":"header","name":"Authorization","dataType":"string"},
+                    ip: {"in":"header","name":"x-forwarded-for","dataType":"string"},
+                    totp: {"in":"header","name":"X-TOTP","dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new IOTController();
+
+
+              const promise = controller.data.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/user/register',
             ...(fetchMiddlewares<RequestHandler>(userController)),
             ...(fetchMiddlewares<RequestHandler>(userController.prototype.register)),
@@ -85,7 +185,7 @@ export function RegisterRoutes(app: Router) {
             function userController_login(request: any, response: any, next: any) {
             const args = {
                     sendResponse: {"in":"res","name":"401","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"resp":{"dataType":"nestedObjectLiteral","nestedProperties":{"data":{"dataType":"any","required":true},"message":{"dataType":"string","required":true},"success":{"dataType":"union","subSchemas":[{"dataType":"enum","enums":[true]},{"dataType":"enum","enums":[false]}],"required":true}},"required":true}}},
-                    payload: {"in":"body","name":"payload","required":true,"ref":"IUserPayload"},
+                    payload: {"in":"body","name":"payload","required":true,"dataType":"nestedObjectLiteral","nestedProperties":{"password":{"dataType":"string","required":true},"email":{"dataType":"string","required":true}}},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa

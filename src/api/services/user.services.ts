@@ -1,6 +1,6 @@
 import { hashPassword, checkPassword } from '../../utils/password'
 import UserModel from '../models/user.model'
-import tokenizer from '../../utils/tokenizer'
+import {signToken, verifyToken, refreshToken} from '../../utils/tokenizer'
 import {  IUserPayload } from '../../interface/user'
 
 export class userService {
@@ -106,12 +106,7 @@ async function getResponse(user: { toObject: () => any }, isLogin?: boolean) {
   delete userObj.password;
   delete userObj._id;
   // if the user is logging in, create a token using tokenizer.generateToken and using user.userId and unit as argument
-  if (isLogin) {
-    userObj.token = await tokenizer.signToken({ userId: userObj.userId, unit: userObj.unit,admin:userObj.admin });
-  }
-  return {
-    user: userObj,
-  };
+  return userObj;
 }
 
 export default new userService();

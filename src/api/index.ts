@@ -26,6 +26,13 @@ app.use(express.json({
   }
 },
 ));
+
+// app.use('/iot', (req, res, next) => {
+//   console.log('IOT request', req.body);
+//   console.log('IOt request headers', req.headers);
+//   res.status(200).send('IOT request received');
+// })
+
 // set end point for ping and respond with pong
 app.get('/ping', (req, res) => {
   res.send('pong');

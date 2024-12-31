@@ -4,7 +4,7 @@ import  path from 'path'
 // lastly set the port
   export const PORT = process.env.PORT ? process.env.PORT : 5000
   export const NODE_ENV = process.env.NODE_ENV || 'development'
-  export const DATABASE_URL = process.env.PORT ? process.env.DATABASE_URL: 'mongodb://127.0.0.1:27017/dlbc-global-crusade-mx';
+  export const DATABASE_URL = process.env.PORT ? process.env.DATABASE_URL: 'mongodb://127.0.0.1:27017/secure-iot';
   export const BASE_URL = process.env.PORT ? process.env.BASE_URL  : 'http://localhost:5000/';
   export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || 'iaowuebpiqupiwr8qb4pq39yrvwyveiwqpbrpiqy8y34yq377v5q45yy5'
   export const BASE_DIR = path.join(__dirname, '..', '..');

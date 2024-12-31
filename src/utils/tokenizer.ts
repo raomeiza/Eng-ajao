@@ -1,10 +1,10 @@
 import jwt, { Secret } from 'jsonwebtoken';
 import { JWT_SECRET_KEY } from '../config';
 
-// create a class that will be used to sign, verify, and decode tokens
-export class Token {
-  // create a method that will sign a token using the constructor secret key
-  public signToken(payload: any, ): string {
+  export const signToken = async (payload: any, expiresIn: string = '24h'): Promise<string> => {
+    // remove exp and iat from the payload
+    delete payload.exp;
+    delete payload.iat;
     // if the secret key is not defined throw an error
     if (!JWT_SECRET_KEY) {
       throw new Error('JWT_SECRET_KEY is not defined');
@@ -12,7 +12,7 @@ export class Token {
     // sign the token using try catch to handle errors
     try {
       // sign the token using the secret key that expires in 1 hour
-      return jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: '1h' });
+      return jwt.sign(payload, JWT_SECRET_KEY, { expiresIn });
     }
     // if there is an error throw it
     catch (err) {
@@ -22,7 +22,7 @@ export class Token {
   }
 
   // create a method that will verify a token using the constructor secret key
-  public verifyToken(token: string): any {
+  export const verifyToken = async (token: string): Promise<any> => {
     // if the secret key is not defined throw an error
     if (!JWT_SECRET_KEY) {
       throw new Error('JWT_SECRET_KEY is not defined');
@@ -39,23 +39,22 @@ export class Token {
     }
   }
 
+  type RefreshToken = (token: any) => Promise<{getToken: () => string, [x:string]: any}>;
+
   // create a method that will refresh a token using the constructor secret key
-  public refreshToken(token: string): string {
+  export const refreshToken: RefreshToken = async (token: any): Promise<{getToken: () => string, [x:string]: any}> => {
     // if the secret key is not defined throw an error
     if (!JWT_SECRET_KEY) {
       throw new Error('JWT_SECRET_KEY is not defined');
     }
     // refresh the token using try catch to handle errors
     try {
-      // verify the token using the secret key
-      const decoded = jwt.verify(token, JWT_SECRET_KEY);
-      // delete the iat and exp properties from the decoded token
-      //@ts-ignore
-      delete decoded.iat;
-      //@ts-ignore
-      delete decoded.exp;
-      // re encode the token and attach it to the request header
-      return jwt.sign(decoded, JWT_SECRET_KEY, { expiresIn: '1h' });
+      token = jwt.verify(token, JWT_SECRET_KEY);
+      // delete the token exp and iat
+      delete token.exp;
+      delete token.iat;
+      let newToken = jwt.sign(token, JWT_SECRET_KEY, { expiresIn: '1h' });
+      return {...token, getToken: () => newToken};
     }
     // if there is an error throw it
     catch (err) {
@@ -63,6 +62,3 @@ export class Token {
       throw err;
     }
   }
-}
-// export the Token class
-export default new Token();
