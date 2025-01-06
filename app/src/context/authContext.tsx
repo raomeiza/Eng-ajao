@@ -63,6 +63,7 @@ export const RequireAuth = (props: { children: React.ReactNode }) => {
 
   // if the user is not logged in, redirect to the login page
   if (!auth.user) {
+    //@ts-ignore
     return <Login/>;
   }
 

@@ -1,7 +1,6 @@
 import {
   Box,
   Typography,
-  TextField,
   InputAdornment,
   Button,
 } from "@mui/material";
@@ -12,8 +11,6 @@ import StyledTextField from "../styled-input";
 
 const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 // create a regex for password. it must contain at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const Login = (props: {
   adjustBgHeight: (arg0: string) => void;
@@ -241,7 +238,7 @@ const Login = (props: {
         size="large"
         ref={submitButtonRef}
         sx={{ width: "100%", mt: 3, }}
-        onClick={(e) => {
+        onClick={(_e) => {
           // e.preventDefault();
           setFormType(formType === "login" ? "register" : "login");
         }}

@@ -108,7 +108,7 @@ export default function LineClickNoSnap({ data }: { data: IOTDAta[] }) {
         <LineChart
           {...lineChartsParams}
           //   onAreaClick={(event, d) => setItemData(d)}
-          onMarkClick={(event, d) => {
+          onMarkClick={(_event, d) => {
             console.log("d", d);
             setItemData(d)
           }}

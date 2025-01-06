@@ -15,6 +15,7 @@ const StyledTextField: React.FC<TextFieldProps> = (props) => {
         const input = inputRef.current;
         if (input) {
           // input.style.WebkitBoxShadow = '0 0 0 1000px transparent inset';
+          // @ts-ignore
           input.style.WebkitTextFillColor = 'white';
           // input.style.backgroundColor = 'none';
           input.style.transition = 'background-color 5000000s ease-in-out 0s';

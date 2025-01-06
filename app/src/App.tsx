@@ -228,7 +228,7 @@ export default function FixedBottomNavigation() {
                 overflow: "auto",
               }}
             >
-              {iotData.map((data, index) => (
+              {iotData.map((data, _index) => (
                 <Paper sx={{ m: 2, backgroundColor: "rgba(0, 0, 0, 0.1)" }}>
                   <List>
                     <ListItemButton key={data.time}>
