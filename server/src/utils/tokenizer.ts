@@ -62,3 +62,20 @@ import { JWT_SECRET_KEY } from '../config';
       throw err;
     }
   }
+
+  // create a method for decoding a token. we don't need to verify the token if its expired
+  export const decodeToken = async (token: string): Promise<any> => {
+    // decode the token using try catch to handle errors
+    try {
+      let data = jwt.decode(token);
+      // @ts-ignore
+      let expired = data?.exp ? new Date(data.exp * 1000) < new Date() : false;
+      // @ts-ignore
+      return { ...data, expired };
+    }
+    // if there is an error throw it
+    catch (err) {
+      // throw the error
+      throw err;
+    }
+  }

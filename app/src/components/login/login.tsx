@@ -5,50 +5,19 @@ import {
   InputAdornment,
   Button,
 } from "@mui/material";
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../contexts/authContext";
 import { User } from "../../App";
-
-// lets create a styled mui textfield component
-export const StyledTextField = (props: any) => {
-  return (
-    <TextField
-      variant="standard"
-      color="secondary"
-      {...props}
-      sx={{
-        width: "100%",
-        mb: 2,
-        '& .MuiInputBase-input': {
-          color: 'white', // Text color
-        },
-        '& .MuiInputLabel-root': {
-          color: 'white', // Label color
-        },
-        '& .MuiInput-underline:before': {
-          borderBottomColor: 'white', // Default underline color
-          borderBottomWidth: '3px',
-        },
-        '& .MuiInput-underline:hover:before': {
-          borderBottomColor: 'white', // Hover underline color
-        },
-        '& .MuiInput-underline:after': {
-          borderBottomColor: 'white', // Active underline color
-        },
-        ...props.sx,
-      }}
-    />
-  );
-}
+import StyledTextField from "../styled-input";
 
 const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 // create a regex for password. it must contain at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetStateAction<User | null>>; }) => {
+const Login = (props: {
+  adjustBgHeight: (arg0: string) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; }) => {
   const [values, setValues] = React.useState({
     email: "",
     password: "",
@@ -56,16 +25,27 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
     name: "",
   });
   const [inputType, setInputType] = React.useState("password");
-  // const from = useLocation().state?.from || "/users";
   const [formType, setFormType] = useState("login");
   const [formError, setFormError] = useState("");
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const handleSubmit = async () => {
+  // for every time there is changes to formType, lets set call the adjustBgHeight function
+  // and set feed it the horizontal position of the submit button
+  useEffect(() => {
+    if (submitButtonRef.current) {
+      props.adjustBgHeight(
+        submitButtonRef.current.getBoundingClientRect().top - 45 + "px"
+      );
+    }
+  }, [formType]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent default form submission
     setErrors({
-      email: "",
-      password: "",
-      confirmPassword: "",
-      name: "",
+      email: " ",
+      password: " ",
+      confirmPassword: " ",
+      name: " ",
     });
     let validEmail = emailRegex.test(values.email.trim());
     let validPassword = values.password.length >= 8;
@@ -78,7 +58,7 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
     if (validEmail && validPassword && validConfirmPassword && validName) {
       console.log("valid");
       let response: any = await fetch(
-        `http://localhost:5000/user/${formType}`,
+        `https://dv25fnzj-5000.uks1.devtunnels.ms/user/${formType}`,
         {
           method: "POST",
           headers: {
@@ -104,10 +84,10 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
       }
     } else {
       setErrors({
-        email:validEmail ? "" : "Invalid email",
-        password:validPassword ? "" : "Invalid password",
-        confirmPassword:validConfirmPassword ? "" : "Passwords do not match",
-        name: validName ? "" : "Name must be at least 3 characters",
+        email: validEmail ? " " : "Invalid email",
+        password: validPassword ? " " : "Invalid password",
+        confirmPassword: validConfirmPassword ? " " : "Passwords do not match",
+        name: validName ? " " : "Name must be at least 3 characters",
       });
     }
   };
@@ -115,14 +95,14 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
   // on every for type change, reset the form
   React.useEffect(() => {
     setValues({ email: "", password: "", confirmPassword: "", name: "" });
-    setErrors({ email: "", password: "", confirmPassword: "", name: "" });
+    setErrors({ email: " ", password: " ", confirmPassword: " ", name: " " });
   }, [formType]);
 
   const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    name: "",
+    email: " ",
+    password: " ",
+    confirmPassword: " ",
+    name: " ",
   });
   // @ts-ignore
   const { signin, user } = useAuth();
@@ -134,10 +114,7 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
       component="form"
       fontWeight={600}
       sx={{ width: "100%", px: 3, position: "relative", height: "100%", display: "flex", flexDirection: "column", justifyContent: "start", color: "white" }}
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit();
-      }}
+      onSubmit={handleSubmit}
     >
       <Typography variant="h5" sx={{ mt: 5, mb: formType === "login" ? 10 : 2, textAlign: "left", opacity: 0.6 }}>
         <Box component="span">Enter details to continue</Box>
@@ -151,8 +128,8 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
           aria-label="name"
           name="name"
           helperText={errors.name}
-          error={errors.name !== ""}
-          sx={{ width: "100%", mb: 2}}
+          error={errors.name !== " "}
+          sx={{ width: "100%", }}
           onChange={(e: { currentTarget: { value: string; }; }) => handleChange("name", e.currentTarget.value)}
         />
       )}
@@ -164,8 +141,8 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
         aria-label="email"
         name="email"
         helperText={errors.email}
-        error={errors.email !== ""}
-        sx={{ width: "100%", mb: 2}}
+        error={errors.email !== " "}
+        sx={{ width: "100%", }}
         onChange={(e: { currentTarget: { value: string; }; }) => handleChange("email", e.currentTarget.value)}
       />
       <StyledTextField
@@ -176,9 +153,9 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
         type={inputType}
         name="password"
         helperText={errors.password}
-        error={errors.password !== ""}
+        error={errors.password !== " "}
         fullWidth
-        sx={{ mb: 2}}
+        sx={{ }}
         onChange={(e: { currentTarget: { value: string; }; }) => handleChange("password", e.currentTarget.value)}
         InputProps={{
           endAdornment: (
@@ -209,9 +186,9 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
           type={inputType}
           name="confirm-password"
           helperText={errors.confirmPassword}
-          error={errors.confirmPassword !== ""}
+          error={errors.confirmPassword !== " "}
           fullWidth
-          sx={{ mb: 2}}
+          sx={{ }}
           onChange={(e: { currentTarget: { value: string; }; }) =>
             handleChange("confirmPassword", e.currentTarget.value)
           }
@@ -242,7 +219,7 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
       <Box sx={{ height: 20 }} />
       <Typography
         variant="body2"
-        sx={{ color: "red", mb: 2, textAlign: "left", opacity: 0.6 }}
+        sx={{ color: "red",  textAlign: "left", opacity: 0.6 }}
       >
         {formError}
       </Typography>
@@ -255,20 +232,17 @@ const Login = (props: { adjustBgHeight: any, setUser: React.Dispatch<React.SetSt
         type="submit"
         role="submit"
         name="submit"
-        sx={{ width: "60px", alignSelf: "center", mt: 2 }}
-        onClick={(e) => {
-          handleSubmit();
-        }}
+        sx={{ width: "60px", alignSelf: "center", mt: 2, backgroundColor: "rgb(244, 242, 248)", color: "primary.main" }}
       >
         Login
       </Button>
       <Button
         variant="text"
         size="large"
-        sx={{ width: "100%", mt: 3 }}
+        ref={submitButtonRef}
+        sx={{ width: "100%", mt: 3, }}
         onClick={(e) => {
           // e.preventDefault();
-          props.adjustBgHeight(formType !== "login" ? "40vh" : "50vh");
           setFormType(formType === "login" ? "register" : "login");
         }}
       >

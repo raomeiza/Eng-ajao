@@ -162,7 +162,8 @@ BatteryStatus readBatteryStatus()
 {
     BatteryStatus status;
     int level = analogRead(B_Pin);               // Replace with the appropriate pin for your battery level
-    status.voltage = level * (3.3 / 4095.0) * 2; // Assuming a voltage divider
+
+    status.voltage = ((level * 3.9) / 4095) * 5; // Assuming a voltage divider
     status.isCharging = digitalRead(BC_Pin);     // Replace with the appropriate pin for your charging status
     return status;
 }
@@ -253,26 +254,52 @@ void clearSD()
     }
 }
 
+// a function to convert the totp and mac address to a json object and encode it
+String packageData(const String& totp, const String& mac) {
+        StaticJsonDocument<200> doc;
+        doc["totp"] = totp;
+        doc["mac"] = mac;
+
+        String package;
+        serializeJson(doc, package);
+        // encode the package
+        package = Base32::encode((uint8_t*)package.c_str(), package.length());
+        return package;
+    }
 // function to read stale data from SD card
 // filepath: /c:/Users/Omeiza/Documents/Arduino/secure_iot/secure_iot.ino
-String readStaleData()
-{
+String readStaleData() {
     String staleData = "";
     File file = SD.open("/stale_data.json", FILE_READ);
-    if (file)
-    {
-        while (file.available())
-        {
-            staleData += file.readString();
-        }
+    if (file) {
+        Serial.print("File size: ");
+        Serial.println(file.size());
+
+        // Allocate a buffer to hold the file content
+        size_t fileSize = file.size();
+        char* buffer = new char[fileSize + 1];
+
+        // Read the entire file into the buffer
+        file.read(reinterpret_cast<uint8_t*>(buffer), fileSize);
+        buffer[fileSize] = '\0'; // Null-terminate the buffer
+
+        staleData = String(buffer);
+
+        // Clean up
+        delete[] buffer;
         file.close();
+
+        Serial.print("Total bytes read: ");
+        Serial.println(fileSize);
+    } else {
+        Serial.println("Failed to open file");
+        return "";
     }
 
     // Parse the JSON array
-    StaticJsonDocument<1024> doc;
+    StaticJsonDocument<2048> doc; // Increase size if necessary
     DeserializationError error = deserializeJson(doc, staleData);
-    if (error)
-    {
+    if (error) {
         Serial.print(F("deserializeJson() failed: "));
         Serial.println(error.f_str());
         return "";
@@ -280,10 +307,8 @@ String readStaleData()
 
     // Extract the inner contents of the JSON array
     String innerContents;
-    for (JsonVariant v : doc.as<JsonArray>())
-    {
-        if (!innerContents.isEmpty())
-        {
+    for (JsonVariant v : doc.as<JsonArray>()) {
+        if (!innerContents.isEmpty()) {
             innerContents += ",";
         }
         innerContents += v.as<String>();
@@ -291,7 +316,6 @@ String readStaleData()
 
     return innerContents;
 }
-
 // function to send data to server
 bool sendData(const String &data)
 {
@@ -307,9 +331,12 @@ bool sendData(const String &data)
     http.begin(url);
     http.addHeader("Content-Type", "application/json");
     http.addHeader("Authorization", "Bearer " + apiToken);
-    http.addHeader("X-TOTP", generateTOTP(DEVICE_SECRET));
-    http.addHeader("X-MAC", mac);
-
+    // http.addHeader("X-TOTP", generateTOTP(DEVICE_SECRET));
+    // http.addHeader("X-MAC", mac);
+    
+    // lets concatenenate the totp and mac address, then encode it and add it to the header as X-Package
+    String encodedPackage = packageData(generateTOTP(DEVICE_SECRET), mac);
+    http.addHeader("X-Package", encodedPackage);
     int httpResponseCode = http.POST(data);
 
     // Print response body for debugging
@@ -322,12 +349,13 @@ bool sendData(const String &data)
         // clearSD(); // Clear stale data on successful send
         http.end();
         // get the new token form response header
-        String newToken = http.header("X-New-Token");
+        String newToken = http.header("X-API-KEY");
         String newTotpSecret = http.header("X-New-Totp-Secret");
         if (!newToken.isEmpty())
         {
             apiToken = newToken;
             preferences.putString("apiToken", newToken);
+            Serial.println("New token from data: " + newToken);
         }
         // if (!newTotpSecret.isEmpty())
         // {
@@ -345,6 +373,8 @@ bool sendData(const String &data)
         if (!newToken.isEmpty())
         {
             apiToken = newToken;
+        } else {
+            Serial.println("Failed to request new token.");
         }
     }
     else
@@ -359,28 +389,52 @@ bool sendData(const String &data)
 String requestNewToken()
 {
     HTTPClient http;
-        String url = String(SERVER_URL) + "/token";
+        String url = String(SERVER_URL) + "/new-token";
+        Serial.println("Token Url: " + url);
     http.begin(url);
 
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("X-TOTP", generateTOTP(DEVICE_SECRET));
-    http.addHeader("X-MAC", mac);
-    http.addHeader("Authorization", "Bearer" + apiToken);
+    // http.addHeader("X-TOTP", generateTOTP(DEVICE_SECRET));
+    // http.addHeader("X-MAC", mac);
+    http.addHeader("Authorization", "Bearer " + apiToken);
+    String encodedPackage = packageData(generateTOTP(DEVICE_SECRET), mac);
+    http.addHeader("X-Package", encodedPackage);
 
-    int httpResponseCode = http.GET();
+    // let's create a json object to store the mac address
+    StaticJsonDocument<256> doc;
+    doc["mac"] = mac;
+    String data;
+    serializeJson(doc, data);
+    int httpResponseCode = http.POST(data);
 
     if (httpResponseCode == 200)
     {
         String response = http.getString();
-        if (response.isEmpty())
-        {
-            Serial.println("Failed to request new token. Empty response.");
+        // Create a StaticJsonDocument to hold the parsed JSON
+        StaticJsonDocument<1024> doc;
+
+        // Parse the JSON response
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (error) {
+            Serial.print(F("deserializeJson() failed: "));
+            Serial.println(error.f_str());
             return "";
         }
-        preferences.putString("apiToken", response);
-        apiToken = response;
-        Serial.println("Received new token: " + response);
-        return response;
+
+        // Extract the token from the parsed JSON
+        const char* token = doc["data"]["token"];
+
+        if (token) {
+            Serial.print("Token: ");
+            Serial.println(token);
+            preferences.putString("apiToken", token);
+            return token;
+        } else {
+            Serial.println("Token not found in the response");
+            Serial.println(response);
+            return "";
+        }
     }
     else
     {
@@ -397,6 +451,7 @@ void setup()
     Serial.begin(115200);
     Wire.begin();
     preferences.begin("secure_iot", false);
+
 
     if(preferences.isKey("apiToken"))
     {
@@ -446,6 +501,7 @@ void setup()
     if (preferences.isKey("apiToken"))
     {
         apiToken = preferences.getString("apiToken");
+        Serial.println("apiToken frop pref: " + apiToken);
     }
 
     // // check if DEVICE_SECRET is stored in preferences
@@ -459,6 +515,7 @@ void setup()
         Serial.println("Failed to initialize SD card.");
         return;
     }
+    // clearSD();
     lcd.createChar(0, (uint8_t*)E_battery);
     lcd.createChar(1,(uint8_t*)one_bar);
     lcd.createChar(2, (uint8_t*)two_bar);
@@ -528,27 +585,27 @@ void loop()
 
     // Display battery level
     lcd.setCursor(15, 0);
-    if(status.voltage > 4.2)
+    if(status.voltage < 3.30)
     {
         lcd.write(0);
     }
-    else if(status.voltage > 4.0)
+    else if(status.voltage < 3.50)
     {
         lcd.write(1);
     }
-    else if(status.voltage > 3.8)
+    else if(status.voltage < 3.60)
     {
         lcd.write(2);
     }
-    else if(status.voltage > 3.6)
+    else if(status.voltage < 3.70)
     {
         lcd.write(3);
     }
-    else if(status.voltage > 3.4)
+    else if(status.voltage < 3.80)
     {
         lcd.write(4);
     }
-    else if(status.voltage > 3.2)
+    else if(status.voltage < 3.90)
     {
         lcd.write(5);
     }
@@ -575,6 +632,7 @@ void loop()
 
     if (currentTime - lastSendTime >= sendInterval)
     {
+        Serial.println("Sending data...");
         StaticJsonDocument<512> doc;
         doc["batteryVoltage"] = status.voltage;
         doc["isCharging"] = status.isCharging;
@@ -585,8 +643,10 @@ void loop()
 
         String data;
         serializeJson(doc, data);
-
+        Serial.println(data);
+        Serial.println("Reading stale data");
         String staleData = readStaleData();
+        Serial.println("Stale data: " + staleData);
         if (!staleData.isEmpty())
         {
             data = "[" + staleData + "," + data + "]";
@@ -596,6 +656,7 @@ void loop()
             data = "[" + data + "]";
         }
 
+        Serial.println(data);
         if (!sendData(data))
         {
             saveToSD(data);

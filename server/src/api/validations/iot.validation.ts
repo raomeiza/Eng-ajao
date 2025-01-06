@@ -26,7 +26,6 @@ export const iotValidation = {
     },
     token: (payload: any) => {
         const schema = Joi.object({
-            totp: Joi.string().required(),
             mac: Joi.string().required()
         });
         const { error } = schema.validate(payload);

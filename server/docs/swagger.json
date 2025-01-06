@@ -37,42 +37,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IOTReqPayload": {
-				"properties": {
-					"batteryVoltage": {
-						"type": "number",
-						"format": "double"
-					},
-					"temperature": {
-						"type": "number",
-						"format": "double"
-					},
-					"humidity": {
-						"type": "number",
-						"format": "double"
-					},
-					"soilMoisture": {
-						"type": "number",
-						"format": "double"
-					},
-					"isCharging": {
-						"type": "boolean"
-					},
-					"time": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"batteryVoltage",
-					"temperature",
-					"humidity",
-					"soilMoisture",
-					"isCharging",
-					"time"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"IRegisterPayload": {
 				"properties": {
 					"email": {
@@ -114,6 +78,42 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"IOTReqPayload": {
+				"properties": {
+					"batteryVoltage": {
+						"type": "number",
+						"format": "double"
+					},
+					"temperature": {
+						"type": "number",
+						"format": "double"
+					},
+					"humidity": {
+						"type": "number",
+						"format": "double"
+					},
+					"soilMoisture": {
+						"type": "number",
+						"format": "double"
+					},
+					"isCharging": {
+						"type": "boolean"
+					},
+					"time": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"batteryVoltage",
+					"temperature",
+					"humidity",
+					"soilMoisture",
+					"isCharging",
+					"time"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
@@ -137,265 +137,6 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/iot/register": {
-			"post": {
-				"operationId": "Register",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {},
-								"examples": {
-									"Example 1": {
-										"value": {
-											"mac": "00:00:00:00:00:00"
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"IOT"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "Authorization",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"mac": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"mac"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/iot/new-token": {
-			"post": {
-				"operationId": "NewToken",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {},
-								"examples": {
-									"Example 1": {
-										"value": {
-											"totp": "123456",
-											"mac": "00:00:00:00:00:00"
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IErrorResponse"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IErrorResponse"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"IOT"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "Authorization",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"properties": {
-									"mac": {
-										"type": "string"
-									}
-								},
-								"required": [
-									"mac"
-								],
-								"type": "object"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/iot/data": {
-			"post": {
-				"operationId": "Data",
-				"responses": {
-					"200": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"IOT"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "header",
-						"name": "Authorization",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "x-forwarded-for",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "X-TOTP",
-						"required": false,
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"items": {
-									"$ref": "#/components/schemas/IOTReqPayload"
-								},
-								"type": "array"
-							}
-						}
-					}
-				}
-			}
-		},
 		"/user/register": {
 			"post": {
 				"operationId": "Register",
@@ -1078,6 +819,369 @@
 					{
 						"in": "header",
 						"name": "auth",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/iot/register": {
+			"post": {
+				"operationId": "Register",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"mac": "00:00:00:00:00:00"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"IOT"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"mac": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"mac"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/iot/new-token": {
+			"post": {
+				"operationId": "NewToken",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {},
+								"examples": {
+									"Example 1": {
+										"value": {
+											"totp": "123456",
+											"mac": "00:00:00:00:00:00"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IErrorResponse"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"IOT"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-package",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"mac": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"mac"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/iot/data": {
+			"post": {
+				"operationId": "Data",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"IOT"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Authorization",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-forwarded-for",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "X-TOTP",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "x-package",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IOTReqPayload"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			},
+			"get": {
+				"operationId": "GetData",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "No content"
+					},
+					"400": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"IOT"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "type",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"csv",
+								"json"
+							]
+						}
+					},
+					{
+						"in": "header",
+						"name": "Authorization",
 						"required": true,
 						"schema": {
 							"type": "string"
