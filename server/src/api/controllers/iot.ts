@@ -242,7 +242,8 @@ export class IOTController {
           res.write('time,batteryVoltage,temperature,humidity,soilMoisture,isCharging\n');
   
           cursor.on('data', (doc) => {
-            const csvRow = `${doc.time},${doc.batteryVoltage},${doc.temperature},${doc.humidity},${doc.soilMoisture},${doc.isCharging}\n`;
+            const csvRow = `${String(doc.time).replace(',', '')
+            },${doc.batteryVoltage},${doc.temperature},${doc.humidity},${doc.soilMoisture},${doc.isCharging}\n`;
             res.write(csvRow);
           });
           cursor.on('end', () => {
