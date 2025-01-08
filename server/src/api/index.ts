@@ -9,6 +9,7 @@ const swaggerDocument = require('../../docs/swagger.json');
 import expressError from '../utils/express.error';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
+import path from 'path';
 
 // Instance of express
 const app: express.Application = express();
@@ -38,6 +39,9 @@ app.get('/ping', (req, res) => {
   res.send('pong');
 }
 );
+
+// public folder
+app.use(express.static(path.join(__dirname, '..', '..', 'public')));
 
 app.use(cors({
   credentials: true, methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', preflightContinue: false, origin: '*',
