@@ -27,6 +27,7 @@ import {
   ListAlt,
   TableChart,
 } from "@mui/icons-material";
+import { API_URL } from "./config";
 
 export interface IOTDAta {
   batteryVoltage: number;
@@ -112,7 +113,7 @@ export default function FixedBottomNavigation() {
   React.useEffect(() => {
     if (!user) return;
     userRef.current = user;
-    const socket = socketIOClient("https://dv25fnzj-5000.uks1.devtunnels.ms", {
+    const socket = socketIOClient(API_URL, {
       transports: ["websocket"],
       query: {
         token: user.token,
@@ -312,7 +313,7 @@ export default function FixedBottomNavigation() {
                   setDownloading("loading");
                   setOpen(false);
                   downloadFile(
-                    "https://dv25fnzj-5000.uks1.devtunnels.ms/iot/data?type=json"
+                    API_URL + "/iot/data?type=json"
                   );
                 },
               },
@@ -323,7 +324,7 @@ export default function FixedBottomNavigation() {
                   setDownloading("loading");
                   setOpen(false);
                   downloadFile(
-                    "https://dv25fnzj-5000.uks1.devtunnels.ms/iot/data?type=csv"
+                    API_URL + "/iot/data?type=csv"
                   );
                 },
               },

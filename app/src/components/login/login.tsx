@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../contexts/authContext";
 import { User } from "../../App";
 import StyledTextField from "../styled-input";
+import { API_URL } from "../../config";
 
 const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 // create a regex for password. it must contain at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character
@@ -55,7 +56,7 @@ const Login = (props: {
     if (validEmail && validPassword && validConfirmPassword && validName) {
       console.log("valid");
       let response: any = await fetch(
-        `https://dv25fnzj-5000.uks1.devtunnels.ms/user/${formType}`,
+        API_URL + `/user/${formType}`,
         {
           method: "POST",
           headers: {

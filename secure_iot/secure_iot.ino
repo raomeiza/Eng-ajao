@@ -27,7 +27,7 @@ const int SM_Pin = 34;
 // define variables used to store informations.
 #define WIFI_SSID "A OMEIZA"
 #define WIFI_PASSWORD "OMEIZA121"
-const char SERVER_URL[] = "https://dv25fnzj-5000.uks1.devtunnels.ms/iot";
+const char SERVER_URL[] = "https://soil-mon-api.onrender.com/iot";
 #define SD_CS_PIN 5
 
 const char ntpServer1[] = "pool.ntp.org";

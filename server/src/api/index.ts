@@ -14,6 +14,11 @@ import path from 'path';
 // Instance of express
 const app: express.Application = express();
 
+//cors middleware
+app.use(cors({
+  credentials: true, methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', preflightContinue: false, origin: '*',
+}));
+
 //app.use(xhub({ algorithm: 'sha1', secret: FACEBOOK_APP_SECRET || (()=> {throw new Error('FACEBOOK_APP_SECRET is not defined') })() }));
 // Initiate Database Connection
 InitiateMongoServer();
