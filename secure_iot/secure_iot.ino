@@ -25,8 +25,8 @@ const int SM_Pin = 34;
 #define DHTTYPE DHT22
 
 // define variables used to store informations.
-#define WIFI_SSID "A OMEIZA"
-#define WIFI_PASSWORD "OMEIZA121"
+#define WIFI_SSID "SEC-IOT"
+#define WIFI_PASSWORD "SEC-IOT112"
 const char SERVER_URL[] = "https://soil-mon-api.onrender.com/iot";
 #define SD_CS_PIN 5
 
@@ -37,11 +37,11 @@ const int daylightOffset_sec = 0;
 
 const char time_zone[] = "CET-1CEST,M3.5.0,M10.5.0/3"; // TimeZone rule for Europe/Rome including daylight adjustment rules (optional)
 
-#define DEVICE_SECRET "N5NUOPSTGZXXSSRSENBSYV3BKRKDYVSJ"
-String apiToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NzMzZTdlZGIyNWIyNTRhMzgxYWU5NCIsIm1hYyI6IjQzOjMwOjNBOjM1OjQ0OjNBIiwibGFzdFNlZW4iOiIyMDI0LTEyLTMxVDAwOjQ0OjQ2LjIzN1oiLCJpYXQiOjE3MzU2MDU4ODYsImV4cCI6MTczNTY5MjI4Nn0.klvoPD2YzGSvLBETbHPUqZkklo2gBUy9_KJJwU8Dogg";
+#define DEVICE_SECRET "JREHOKBTIRGGEIKKMYYFWMDBER2XOOKJ"
+String apiToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3N2YwMjUzNmU3NWJkZDc0ZDI2NDNlMSIsIm1hYyI6IjQzOjMwOjNBOjM1OjQ0OjNBIiwibGFzdFNlZW4iOiIyMDI1LTAxLTA4VDIyOjU1OjE1LjAwMFoiLCJpYXQiOjE3MzYzNzY5MTUsImV4cCI6MTczNjQ2MzMxNX0.b-NI80RLK6ooRiC6-9pqVm7oljx9dpDKKOjOPkjaJCc";
 
 unsigned long lastSendTime = 0;
-const unsigned long sendInterval = 300000/5; // send data every 1 minute
+const unsigned long sendInterval = 300000/2; // send data every 2.5 minutes
 // lets create a variable that will store the mac address of the device
 char mac[18];
 

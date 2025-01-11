@@ -83,8 +83,12 @@ export class IOTController {
         if(!decodedIOT || !decodedIOT.mac || decodedIOT.mac !== payload.mac || !decodedIOT.id || decodedIOT.mac !== mac) {
             throw { message: 'Unauthorized', status: 401 }
         }
+        const device = await IOTDeviceModel.findById(decodedIOT.id)
+        if(!device) {
+            throw { message: 'Device not found', status: 404 }
+        }
 
-        const validTOTP = await verifyTOTP(decodedIOT.totpSecret, totp)
+        const validTOTP = await verifyTOTP(device.totpSecret, totp)
 
         if(!validTOTP) {
             throw { message: 'Unauthorized', status: 401 }
@@ -92,10 +96,6 @@ export class IOTController {
 
         iotValidation.token(payload) // validate the payload
 
-        const device = await IOTDeviceModel.findById(decodedIOT.id)
-        if(!device) {
-            throw { message: 'Device not found', status: 404 }
-        }
         if(device.mac !== mac) {
             throw { message: 'Unauthorized', status: 401 }
         }
@@ -164,7 +164,7 @@ export class IOTController {
             throw { message: 'Unauthorized', status: 401 }
         }
         device.lastSeen = new Date()
-        let newToken = await signToken({ id: device.id, mac: device.mac, lastSeen: device.lastSeen }) // sign token
+        let newToken = await signToken({ id: device.id, mac: device.mac, lastSeen: device.lastSeen }, '10m') // sign token with 10 minutes expiration
         device.token = newToken
         await device.save() // update the device
         iotValidation.data(payload) // validate the payload
