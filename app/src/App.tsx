@@ -15,6 +15,7 @@ import {
   ListItemIcon,
   SpeedDial,
   SpeedDialAction,
+  Typography,
 } from "@mui/material";
 import LineClickNoSnap from "./components/chart";
 import MTable from "./components/table";
@@ -52,8 +53,8 @@ export default function FixedBottomNavigation() {
   const [user, setUser] = React.useState<User | null>(userRef.current);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => {
-    if(downloading === "loading") return;
-    setOpen(true)
+    if (downloading === "loading") return;
+    setOpen(true);
   };
   const handleClose = () => setOpen(false);
   const [downloading, setDownloading] = React.useState<
@@ -83,7 +84,7 @@ export default function FixedBottomNavigation() {
 
       const blob = await response.blob();
       const contentDisposition = response.headers.get("Content-Disposition");
-      let filename = "iot_data-"+ new Date().toLocaleString()
+      let filename = "iot_data-" + new Date().toLocaleString();
 
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?(.+)"?/);
@@ -220,35 +221,59 @@ export default function FixedBottomNavigation() {
           }}
         ></Box>
         {user ? (
-          value === 0 ? (
+          iotData.length ? (
+            value === 0 ? (
+              <Box
+                sx={{
+                  width: "100%",
+                  bgcolor: "rgba(0, 0, 0, 0.1)",
+                  height: "100%",
+                  overflow: "auto",
+                }}
+              >
+                {iotData.map((data, _index) => (
+                  <Paper sx={{ m: 2, backgroundColor: "rgba(0, 0, 0, 0.1)" }}>
+                    <List>
+                      <ListItemButton key={data.time}>
+                        <ListItemIcon>
+                          <RestoreIcon />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={new Date(data.time).toLocaleString()}
+                          secondary={`Battery Voltage: ${data.batteryVoltage}V, Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%, Soil Moisture: ${data.soilMoisture}%, isCharging: ${data.isCharging}`}
+                        />
+                      </ListItemButton>
+                    </List>
+                  </Paper>
+                ))}{" "}
+              </Box>
+            ) : value === 1 ? (
+              <LineClickNoSnap data={iotData} />
+            ) : (
+              <MTable iotData={iotData} />
+            )
+          ) : (
             <Box
               sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 width: "100%",
-                bgcolor: "rgba(0, 0, 0, 0.1)",
                 height: "100%",
-                overflow: "auto",
+                color: "primary.main",
+                flexDirection: "column",
               }}
             >
-              {iotData.map((data, _index) => (
-                <Paper sx={{ m: 2, backgroundColor: "rgba(0, 0, 0, 0.1)" }}>
-                  <List>
-                    <ListItemButton key={data.time}>
-                      <ListItemIcon>
-                        <RestoreIcon />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={new Date(data.time).toLocaleString()}
-                        secondary={`Battery Voltage: ${data.batteryVoltage}V, Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%, Soil Moisture: ${data.soilMoisture}%, isCharging: ${data.isCharging}`}
-                      />
-                    </ListItemButton>
-                  </List>
-                </Paper>
-              ))}{" "}
+              <Typography
+                variant="h6"
+                width={"100%"}
+                sx={{ textAlign: "center" }}
+                gutterBottom
+              >
+                Waiting for data from server
+              </Typography>
+              <CircularProgress />
             </Box>
-          ) : value === 1 ? (
-            <LineClickNoSnap data={iotData} />
-          ) : (
-            <MTable iotData={iotData} />
           )
         ) : (
           <Login adjustBgHeight={setUpperBgHeight} setUser={setUser} />
@@ -312,9 +337,7 @@ export default function FixedBottomNavigation() {
                 action: () => {
                   setDownloading("loading");
                   setOpen(false);
-                  downloadFile(
-                    API_URL + "/iot/data?type=json"
-                  );
+                  downloadFile(API_URL + "/iot/data?type=json");
                 },
               },
               {
@@ -323,9 +346,7 @@ export default function FixedBottomNavigation() {
                 action: () => {
                   setDownloading("loading");
                   setOpen(false);
-                  downloadFile(
-                    API_URL + "/iot/data?type=csv"
-                  );
+                  downloadFile(API_URL + "/iot/data?type=csv");
                 },
               },
             ].map((action) => (
