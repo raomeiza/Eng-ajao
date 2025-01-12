@@ -44,6 +44,8 @@ unsigned long lastSendTime = 0;
 const unsigned long sendInterval = 300000/2; // send data every 2.5 minutes
 // lets create a variable that will store the mac address of the device
 char mac[18];
+bool debugMode = true;
+bool firstRun = false;
 
 LCD_I2C lcd(0x27, 16, 2);
 DHT dht(DHTPIN, DHTTYPE);
@@ -217,7 +219,10 @@ void connectWiFi()
         Serial.print(".");
     }
     sprintf(mac, "%02X:%02X:%02X:%02X:%02X:%02X", WiFi.macAddress()[0], WiFi.macAddress()[1], WiFi.macAddress()[2], WiFi.macAddress()[3], WiFi.macAddress()[4], WiFi.macAddress()[5]);
+    if (debugMode)
+    {
     Serial.println("Mac address: " + String(mac));
+    }
     Serial.println("Connected!");
 }
 
@@ -272,9 +277,12 @@ String readStaleData() {
     String staleData = "";
     File file = SD.open("/stale_data.json", FILE_READ);
     if (file) {
+
+        if(debugMode)
+        {
         Serial.print("File size: ");
         Serial.println(file.size());
-
+        }
         // Allocate a buffer to hold the file content
         size_t fileSize = file.size();
         char* buffer = new char[fileSize + 1];
@@ -288,9 +296,11 @@ String readStaleData() {
         // Clean up
         delete[] buffer;
         file.close();
-
+        if(debugMode)
+        {
         Serial.print("Total bytes read: ");
         Serial.println(fileSize);
+        }
     } else {
         Serial.println("Failed to open file");
         return "";
@@ -300,8 +310,11 @@ String readStaleData() {
     StaticJsonDocument<2048> doc; // Increase size if necessary
     DeserializationError error = deserializeJson(doc, staleData);
     if (error) {
+        if(debugMode)
+        {
         Serial.print(F("deserializeJson() failed: "));
         Serial.println(error.f_str());
+        }
         return "";
     }
 
@@ -341,7 +354,10 @@ bool sendData(const String &data)
 
     // Print response body for debugging
     String response = http.getString();
+    if(debugMode)
+    {
     Serial.println("Response: " + response);
+    }
 
     if (httpResponseCode == 200)
     {
@@ -355,7 +371,7 @@ bool sendData(const String &data)
         {
             apiToken = newToken;
             preferences.putString("apiToken", newToken);
-            Serial.println("New token from data: " + newToken);
+            // Serial.println("New token from data: " + newToken);
         }
         // if (!newTotpSecret.isEmpty())
         // {
@@ -390,7 +406,7 @@ String requestNewToken()
 {
     HTTPClient http;
         String url = String(SERVER_URL) + "/new-token";
-        Serial.println("Token Url: " + url);
+        // Serial.println("Token Url: " + url);
     http.begin(url);
 
     http.addHeader("Content-Type", "application/json");
@@ -426,13 +442,19 @@ String requestNewToken()
         const char* token = doc["data"]["token"];
 
         if (token) {
+            if(debugMode)
+            {
             Serial.print("Token: ");
             Serial.println(token);
+            }
             preferences.putString("apiToken", token);
             return token;
         } else {
+            if(debugMode)
+            {
             Serial.println("Token not found in the response");
             Serial.println(response);
+            }
             return "";
         }
     }
@@ -450,7 +472,8 @@ void setup()
 {
     Serial.begin(115200);
     Wire.begin();
-    preferences.begin("secure_iot", false);
+    firstRun = !preferences.begin("secure_iot", false);
+    debugMode = firstRun;
 
 
     if(preferences.isKey("apiToken"))
@@ -483,11 +506,11 @@ void setup()
     hmacKey = Base32::decode(DEVICE_SECRET);
 
     // Print the decoded secret for verification
-    Serial.print("Decoded Secret: ");
-    for (size_t i = 0; i < hmacKey.size(); i++) {
-        Serial.printf("%02X", hmacKey[i]);
-    }
-    Serial.println();
+    // Serial.print("Decoded Secret: ");
+    // for (size_t i = 0; i < hmacKey.size(); i++) {
+    //     Serial.printf("%02X", hmacKey[i]);
+    // }
+    // Serial.println();
 
     // Initialize TOTP with the decoded secret
     totp = new TOTP(hmacKey.data(), hmacKey.size());
@@ -495,13 +518,13 @@ void setup()
     // Generate TOTP code
     long currentTime = time(nullptr); // Get the current time
     char* code = totp->getCode(currentTime);
-    Serial.print("TOTP Code: ");
-    Serial.println(code);
+    // Serial.print("TOTP Code: ");
+    // Serial.println(code);
     // check if apiToken is stored in preferences
     if (preferences.isKey("apiToken"))
     {
         apiToken = preferences.getString("apiToken");
-        Serial.println("apiToken frop pref: " + apiToken);
+        // Serial.println("apiToken frop pref: " + apiToken);
     }
 
     // // check if DEVICE_SECRET is stored in preferences
@@ -557,6 +580,8 @@ void loop()
     int soilMoisture = readSoilMoisture();
     String timeNowString = printLocalTime(); // Use short format
 
+    if(debugMode)
+    {
     // print all data to the serial monitor
     Serial.print("Battery voltage: ");
     Serial.print(status.voltage);
@@ -581,6 +606,7 @@ void loop()
     Serial.println("Last send time: " + String(lastSendTime));
     Serial.println("Send interval: " + String(sendInterval));
     Serial.println("Time since last send: " + String(currentTime - lastSendTime));
+    }
     lcd.clear();
 
     // Display battery level

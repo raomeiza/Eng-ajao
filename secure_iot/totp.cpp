@@ -1,8 +1,5 @@
 // OpenAuthentication Time-based One-time Password Algorithm (RFC 6238)
-// For the complete description of the algorithm see
-// http://tools.ietf.org/html/rfc4226#section-5.3
-//
-// Luca Dentella (http://www.lucadentella.it)
+// R A Omeiza (https://www.raomeiza.me)
 
 #include "TOTP.h"
 #include "sha1.h"
